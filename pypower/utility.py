@@ -1,7 +1,6 @@
 import pygame
-import definition
 import math
-
+from . import direction
 
 def move_rect_by_alignment(rect, pos, alignment):
   if alignment[0] == -1:
@@ -22,7 +21,8 @@ def move_rect_by_alignment(rect, pos, alignment):
   else:
     raise ValueError("alignment must be a tuple of -1, 0, or 1 whose length is 2 like (-1, 0), (1, -1), or (1, 1)")
 
-
+    
+#################################### Not completed
 class DirectionFinder:
   def __init__(self):
     self._sprites = pygame.sprite.LayeredDirty()
@@ -49,16 +49,16 @@ class DirectionFinder:
     get_pos1 = None
     get_pos2 = None
 
-    if direction == definition.UP:
+    if direction == direction.UP:
       get_pos1 = lambda sprite: sprite.rect.midleft
       get_pos2 = lambda sprite: sprite.rect.midright
-    elif direction == definition.DOWN:
+    elif direction == direction.DOWN:
       get_pos1 = lambda sprite: sprite.rect.midright
       get_pos2 = lambda sprite: sprite.rect.midleft
-    elif direction == definition.LEFT:
+    elif direction == direction.LEFT:
       get_pos1 = lambda sprite: sprite.rect.midbottom
       get_pos2 = lambda sprite: sprite.rect.midtop
-    elif direction == definition.RIGHT:
+    elif direction == direction.RIGHT:
       get_pos1 = lambda sprite: sprite.rect.midtop
       get_pos2 = lambda sprite: sprite.rect.midbottom
     else:
@@ -72,16 +72,16 @@ class DirectionFinder:
     for sprite in self._sprites:
       print("testing sprite: ", sprite)  ###############
       print("direction: ", direction)  ###############
-      if direction == definition.UP and fiducial_sprite.rect.centery <= sprite.rect.centery:
+      if direction == direction.UP and fiducial_sprite.rect.centery <= sprite.rect.centery:
         print("continued")  #######################
         continue
-      elif direction == definition.DOWN and fiducial_sprite.rect.centery >= sprite.rect.centery:
+      elif direction == direction.DOWN and fiducial_sprite.rect.centery >= sprite.rect.centery:
         print("continued", fiducial_sprite.rect.centery, sprite.rect.centery)  #######################
         continue
-      elif direction == definition.LEFT and fiducial_sprite.rect.centerx <= sprite.rect.centerx:
+      elif direction == direction.LEFT and fiducial_sprite.rect.centerx <= sprite.rect.centerx:
         print("continued")  #######################
         continue
-      elif direction == definition.RIGHT and fiducial_sprite.rect.centerx >= sprite.rect.centerx:
+      elif direction == direction.RIGHT and fiducial_sprite.rect.centerx >= sprite.rect.centerx:
         print("continued")  #######################
         continue
 
@@ -95,7 +95,7 @@ class DirectionFinder:
       flag1 = False
       flag2 = False
 
-      if direction == definition.LEFT:  ############################
+      if direction == direction.LEFT:  ############################
         flag1 = angle12 >= base_angle - fiducial_angle or angle12 < -90
         flag2 = angle21 <= -base_angle + fiducial_angle or angle21 > 90
       else:
@@ -111,13 +111,13 @@ class DirectionFinder:
     print("candidates: ", candidates) ######
 
     if candidates:
-      if direction == definition.UP:
+      if direction == direction.UP:
         return max(candidates, key=lambda sprite: (sprite.rect.centery - abs(sprite.rect.centerx - fiducial_sprite.rect.centerx)))
-      elif direction == definition.DOWN:
+      elif direction == direction.DOWN:
         return min(candidates, key=lambda sprite: (sprite.rect.centery + abs(sprite.rect.centerx - fiducial_sprite.rect.centerx)))
-      elif direction == definition.LEFT:
+      elif direction == direction.LEFT:
         return max(candidates, key=lambda sprite: (sprite.rect.centerx - abs(sprite.rect.centery - fiducial_sprite.rect.centery)))
-      elif direction == definition.RIGHT:
+      elif direction == direction.RIGHT:
         return min(candidates, key=lambda sprite: (sprite.rect.centerx + abs(sprite.rect.centery - fiducial_sprite.rect.centery)))
     else:
       print("fiducial_sprite is returned")  #########################
