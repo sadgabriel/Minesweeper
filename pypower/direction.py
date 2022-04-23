@@ -22,8 +22,10 @@ class Direction:
     else:
       IndexError("Direction's index must be 0 or 1")
 
-  def apply(self, pos):
-    return (pos[0] + self.x, pos[1] + self.y)
+  def __add__(self, pos):
+    return (pos[0] + self[0], pos[1] + self[1])
+
+  __radd__ = __add__
 
 UP = Direction(0, -1)
 DOWN = Direction(0, 1)

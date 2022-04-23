@@ -22,7 +22,7 @@ class MainScene(pypower.scene.Scene):
       if event.type == pygame.MOUSEBUTTONDOWN:
         for spr in self.all_sprites:
           if spr.rect.collidepoint(event.pos):
-            if spr == self.board:
+            if spr == self.board and not self.board.game_over:
               index = self.board.get_index_from_pos(event.pos)
               if event.button == 1:
                 # Open Box
@@ -34,12 +34,12 @@ class MainScene(pypower.scene.Scene):
                 # Open Surrounding Boxes
                 flaged = 0
                 for direction in pypower.direction.DIRECTIONS8:
-                  if self.board.is_flaged(direction.apply(index)):
+                  if self.board.is_flaged(index+direction):
                     flaged += 1
 
                 if self.board.is_opened(index) and flaged == self.board.get_number(index):
                   for direction in pypower.direction.DIRECTIONS8:
-                    self.board.open(direction.apply(index))
+                    self.board.open(index+direction)
 
                   if self.board.game_over:
                     # Game Over
@@ -47,7 +47,11 @@ class MainScene(pypower.scene.Scene):
               elif event.button == 3:
                 # Toggle Flag
                 self.board.toggle_flag(index)
-                
+      elif event.type == pygame.KEYDOWN:
+        if event.key == pygame.K_SPACE:
+          self.board.kill()
+          self.board = Board(self.board.x, self.board.y, self.board.n)
+          self.all_sprites.add(self.board)
                 
 class Board(pypower.sprite.Composite):
   def __init__(self, x, y, n):
@@ -103,7 +107,7 @@ class Board(pypower.sprite.Composite):
       raise IndexError("Invaild Index")
 
   def toggle_flag(self, index):
-    if self.is_vaild(index):
+    if self.is_vaild(index) and not self.is_opened(index):
       self._get(index).toggle_flag()
 
   def init(self, index):
@@ -118,15 +122,15 @@ class Board(pypower.sprite.Composite):
         
       ok = True
       for direction in pypower.direction.DIRECTIONS8:
-        if direction.apply(index) == rand_index:
+        if index+direction == rand_index:
           ok = False
         
       if ok:
         self._get(rand_index).mine = True
         mine += 1
         for direction in pypower.direction.DIRECTIONS8:
-          if self.is_vaild(direction.apply(rand_index)):
-            self._get(direction.apply(rand_index)).number += 1
+          if self.is_vaild(rand_index+direction):
+            self._get(rand_index+direction).number += 1
           
   def open(self, index):
     if not self.is_vaild(index) or self.is_flaged(index):
@@ -142,8 +146,8 @@ class Board(pypower.sprite.Composite):
       
     if self._get(index).number == 0:
       for direction in pypower.direction.DIRECTIONS8:
-        if self.is_vaild(direction.apply(index)) and not self.is_opened(direction.apply(index)) and not self.is_flaged(direction.apply(index)):
-          self.open(direction.apply(index))
+        if self.is_vaild(index+direction) and not self.is_opened(index+direction) and not self.is_flaged(index+direction):
+          self.open(index+direction)
 
 
 class Box(pypower.sprite.Composite):
